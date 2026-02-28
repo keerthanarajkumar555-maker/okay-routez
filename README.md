@@ -364,9 +364,9 @@ python script.py -v --format json data.json
 ## Project Demo
 
 ### Video
-[Add your demo video link here - YouTube, Google Drive, etc.]
+[https://drive.google.com/file/d/1OemNcn0XeU9sMQzVGqO11zFskiaaXq98/view?usp=drive_link]
 
-*Explain what the video demonstrates - key features, user flow, technical highlights*
+Okay Routez is a real-time location-based app that tells you if an area is safe, moderate, or high-risk. You can check your current location or search any area, view it on a map, and instantly send an SOS alert to notify others if you’re in danger*
 
 ### Additional Demos
 [Add any extra demo materials/links - Live site, APK download, online demo, etc.]
