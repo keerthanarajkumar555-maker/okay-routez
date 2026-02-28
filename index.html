@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Safety Zone Checker</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:white;
+    text-align:center;
+}
+
+.container{ padding:20px; }
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    margin:5px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+.liveBtn{ background:#2563eb; color:white; }
+.searchBtn{ background:#9333ea; color:white; }
+.sosBtn{ background:red; color:white; margin-top:10px; }
+
+input{
+    padding:10px;
+    border-radius:6px;
+    border:none;
+    width:220px;
+    margin:5px;
+}
+
+#map{
+    height:60vh;
+    width:95%;
+    margin:auto;
+    border-radius:12px;
+    margin-top:10px;
+    display:none;
+}
+
+#status{
+    font-size:20px;
+    font-weight:bold;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>🌍 Smart Safety Zone Checker</h2>
+
+<button class="liveBtn" onclick="useLive()">📍 Use Live Location</button>
+
+<br><br>
+
+<input id="areaName" placeholder="Enter Area Name">
+<button class="searchBtn" onclick="searchArea()">Search Area</button>
+
+<div id="status"></div>
+<button class="sosBtn" id="sosBtn" style="display:none;">🚨 Send SOS</button>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script type="module">
+
+/* ================= FIREBASE ================= */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc } 
+from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ================= MAP ================= */
+
+let map;
+let marker;
+let userLat, userLng;
+let currentZone="Safe";
+
+function initMap(lat,lng){
+    document.getElementById("map").style.display="block";
+    document.getElementById("sosBtn").style.display="inline-block";
+
+    if(!map){
+        map=L.map('map').setView([lat,lng],14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+        .addTo(map);
+    }else{
+        map.setView([lat,lng],14);
+    }
+
+    if(!marker){
+        marker=L.marker([lat,lng]).addTo(map);
+    }else{
+        marker.setLatLng([lat,lng]);
+    }
+}
+
+/* ================= SAFETY CLASSIFICATION ================= */
+
+function classifyArea(lat,lng){
+
+    let riskValue=Math.random();
+
+    if(riskValue<0.3){
+        currentZone="High Risk";
+        updateStatus("🔴 HIGH RISK AREA","red");
+    }
+    else if(riskValue<0.6){
+        currentZone="Moderate Risk";
+        updateStatus("🟡 MODERATE AREA","yellow");
+    }
+    else{
+        currentZone="Safe Area";
+        updateStatus("🟢 SAFE AREA","lightgreen");
+    }
+
+    saveCheck(lat,lng,currentZone);
+}
+
+function updateStatus(text,color){
+    let s=document.getElementById("status");
+    s.innerHTML=text;
+    s.style.color=color;
+}
+
+/* ================= LIVE LOCATION ================= */
+
+window.useLive=function(){
+    navigator.geolocation.getCurrentPosition(pos=>{
+        userLat=pos.coords.latitude;
+        userLng=pos.coords.longitude;
+        initMap(userLat,userLng);
+        classifyArea(userLat,userLng);
+    });
+}
+
+/* ================= SEARCH AREA NAME ================= */
+
+window.searchArea=async function(){
+
+    let area=document.getElementById("areaName").value;
+    if(area===""){
+        alert("Enter area name");
+        return;
+    }
+
+    let response=await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${area}`
+    );
+
+    let data=await response.json();
+
+    if(data.length===0){
+        alert("Location not found");
+        return;
+    }
+
+    userLat=parseFloat(data[0].lat);
+    userLng=parseFloat(data[0].lon);
+
+    initMap(userLat,userLng);
+    classifyArea(userLat,userLng);
+}
+
+/* ================= BACKEND STORAGE ================= */
+
+async function saveCheck(lat,lng,zone){
+    await addDoc(collection(db,"area_checks"),{
+        latitude:lat,
+        longitude:lng,
+        zone:zone,
+        time:new Date()
+    });
+}
+
+/* ================= SOS ================= */
+
+document.getElementById("sosBtn").addEventListener("click",async()=>{
+    await addDoc(collection(db,"sos_alerts"),{
+        latitude:userLat,
+        longitude:userLng,
+        zone:currentZone,
+        time:new Date()
+    });
+
+    alert("🚨 SOS Sent Successfully!");
+});
+
+</script>
+</body>
+</html>
