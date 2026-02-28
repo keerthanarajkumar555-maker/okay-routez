@@ -16,13 +16,13 @@
 [https://okay-routez-mif8.vercel.app/]
 
 ### Project Description
-[Smart Safety Zone Checker is a web app that lets users check the safety of any area using their live location or by searching an area name. It classifies locations into Safe, Moderate, or High-Risk zones on an interactive map and allows users to send SOS alerts, with all data stored in Firebase for monitoring.]
+[Okay Routez is a web site that lets users check the safety of any area using their live location or by searching an area name. It classifies locations into Safe, Moderate, or High-Risk zones on an interactive map and allows users to send SOS alerts, with all data stored in Firebase for monitoring.]
 
 ### The Problem statement
 [In many urban and unfamiliar areas, people often lack real-time information about the safety of their surroundings, which can put them at risk. There is a need for a simple, accessible tool that can quickly assess the safety of a location, provide visual feedback on risk levels, and enable users to send emergency alerts if needed.]
 
 ### The Solution
-[The Smart Safety Zone Checker provides a web-based platform that uses live GPS or area search to classify locations into Safe, Moderate, or High-Risk zones on an interactive map. It stores location checks and SOS alerts in Firebase, enabling users to quickly assess safety, receive visual guidance, and send emergency alerts when required.]
+[Okay Routez provides a web-based platform that uses live GPS or area search to classify locations into Safe, Moderate, or High-Risk zones on an interactive map. It stores location checks and SOS alerts in Firebase, enabling users to quickly assess safety, receive visual guidance, and send emergency alerts when required.]
 
 ---
 
